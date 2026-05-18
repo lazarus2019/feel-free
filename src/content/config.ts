@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const posts = defineCollection({
   type: 'content',
@@ -26,4 +27,22 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { posts, pages };
+const articles = defineCollection({
+  loader: glob({
+    base: './src/content-feel-free/gitlab/docs',
+    pattern: [
+      '**/*.{md,mdx}',
+      '!**/README.{md,mdx}',
+      '!**/BRAIN_STORM.{md,mdx}',
+    ],
+  }),
+  // schema: z.object({
+  //   title: z.string(),
+  //   h1: z.string(),
+  //   announcement: z.string(),
+  //   permalink: z.string(),
+  //   date: z.coerce.date().optional(),
+  // }),
+});
+
+export const collections = { posts, pages, articles };

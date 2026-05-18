@@ -24,9 +24,11 @@ const CATEGORY_PLACEHOLDERS: Record<string, string> = {
 const SLASH_TRIM_REGEX = /^\/+|\/+$/g;
 const DOMAIN_PREFIX_REGEX = /^https?:\/\/[^/]+/i;
 
-const trimSlashes = (value: string): string => value.replace(SLASH_TRIM_REGEX, '');
+const trimSlashes = (value: string): string =>
+  value.replace(SLASH_TRIM_REGEX, '');
 
-const stripDomain = (value: string): string => value.replace(DOMAIN_PREFIX_REGEX, '');
+const stripDomain = (value: string): string =>
+  value.replace(DOMAIN_PREFIX_REGEX, '');
 
 const normalizePath = (value: string | undefined | null): string | null => {
   if (!value) {
@@ -43,7 +45,11 @@ const normalizePath = (value: string | undefined | null): string | null => {
   return normalized ? normalized : null;
 };
 
-const pickSegment = (value: string, fallback: string, context?: string): string => {
+const pickSegment = (
+  value: string,
+  fallback: string,
+  context?: string,
+): string => {
   if (!value.includes('/')) {
     return value;
   }
@@ -85,7 +91,9 @@ function derivePostMeta(entry: PostEntry) {
   const translationKey = fallbackKey;
 
   const fallbackSlug =
-    rest.length > 0 ? rest[rest.length - 1] : entry.slug.split('/').pop() ?? entry.id;
+    rest.length > 0
+      ? rest[rest.length - 1]
+      : (entry.slug.split('/').pop() ?? entry.id);
 
   return { lang, category, translationKey, fallbackSlug };
 }
@@ -97,7 +105,9 @@ function derivePageMeta(entry: PageEntry) {
   const translationKey = fallbackKey;
 
   const fallbackSlug =
-    rest.length > 0 ? rest[rest.length - 1] : entry.slug.split('/').pop() ?? entry.id;
+    rest.length > 0
+      ? rest[rest.length - 1]
+      : (entry.slug.split('/').pop() ?? entry.id);
   const fallbackPath = rest.join('/');
 
   return { lang, translationKey, fallbackSlug, fallbackPath };
@@ -129,20 +139,26 @@ function filterDraftedEntries<T>(
 
   const draftKeys = buildDraftTranslationKeySet(entries, getKey);
 
-  return (entries as Array<T & { data: { draft?: boolean } }>).filter((entry) => {
-    if (entry.data?.draft) {
-      return false;
-    }
+  return (entries as Array<T & { data: { draft?: boolean } }>).filter(
+    (entry) => {
+      if (entry.data?.draft) {
+        return false;
+      }
 
-    return !draftKeys.has(getKey(entry));
-  });
+      return !draftKeys.has(getKey(entry));
+    },
+  );
 }
 
-const filterDraftedPostEntries = (entries: PostEntry[], includeDrafts = false) =>
-  filterDraftedEntries(entries, getPostTranslationKey, includeDrafts);
+const filterDraftedPostEntries = (
+  entries: PostEntry[],
+  includeDrafts = false,
+) => filterDraftedEntries(entries, getPostTranslationKey, includeDrafts);
 
-const filterDraftedPageEntries = (entries: PageEntry[], includeDrafts = false) =>
-  filterDraftedEntries(entries, getPageTranslationKey, includeDrafts);
+const filterDraftedPageEntries = (
+  entries: PageEntry[],
+  includeDrafts = false,
+) => filterDraftedEntries(entries, getPageTranslationKey, includeDrafts);
 
 export async function getPosts(options: GetPostsOptions = {}) {
   const { lang, category, includeDrafts = false } = options;
@@ -226,10 +242,7 @@ export function getPostImage(entry: PostEntry) {
 
   const category = getPostCategory(entry);
 
-  return (
-    CATEGORY_PLACEHOLDERS[category] ??
-    siteConfig.featuredImageFallback
-  );
+  return CATEGORY_PLACEHOLDERS[category] ?? siteConfig.featuredImageFallback;
 }
 
 export function getPageLanguage(entry: PageEntry) {
@@ -274,7 +287,8 @@ export const getEnabledCategoryIds = (): string[] =>
 export const isCategoryEnabled = (categoryId: string): boolean =>
   Boolean(siteConfig.categories[categoryId]?.enabled);
 
-export const getCategoryConfig = (categoryId: string) => siteConfig.categories[categoryId] ?? null;
+export const getCategoryConfig = (categoryId: string) =>
+  siteConfig.categories[categoryId] ?? null;
 
 export function getCategoryPathSegment(categoryId: string): string {
   if (categoryPathSegmentCache.has(categoryId)) {
@@ -295,7 +309,11 @@ export function getCategoryPathSegment(categoryId: string): string {
     return fallback;
   }
 
-  const segment = pickSegment(normalized, fallback, `Category "${categoryId}" path`);
+  const segment = pickSegment(
+    normalized,
+    fallback,
+    `Category "${categoryId}" path`,
+  );
   categoryPathSegmentCache.set(categoryId, segment);
   return segment;
 }
@@ -304,7 +322,10 @@ export function getCategoryPath(categoryId: string): string {
   return ensureTrailingSlash(`/${getCategoryPathSegment(categoryId)}`);
 }
 
-export function getCategoryPermalink(categoryId: string, lang: string = DEFAULT_LOCALE): string {
+export function getCategoryPermalink(
+  categoryId: string,
+  lang: string = DEFAULT_LOCALE,
+): string {
   const basePath = getCategoryPath(categoryId);
   return lang === DEFAULT_LOCALE
     ? basePath
@@ -325,7 +346,11 @@ export function findCategoryIdByPathSegment(segment: string): string | null {
 
 export const getPostSlug = (entry: PostEntry): string => {
   const { fallbackSlug } = derivePostMeta(entry);
-  return getSlugFromPermalink(entry.data.permalink, fallbackSlug, `Post "${entry.id}" permalink`);
+  return getSlugFromPermalink(
+    entry.data.permalink,
+    fallbackSlug,
+    `Post "${entry.id}" permalink`,
+  );
 };
 
 export type PostsByLocale = {
@@ -348,7 +373,11 @@ export async function groupPostsByLocales(
 
   const groups = await Promise.all(
     locales.map(async (locale) => {
-      const postsForLocale = await getPosts({ lang: locale, category, includeDrafts });
+      const postsForLocale = await getPosts({
+        lang: locale,
+        category,
+        includeDrafts,
+      });
       return { lang: locale, posts: postsForLocale };
     }),
   );
@@ -375,7 +404,9 @@ export async function findTopLevelPage(options: {
   return entrySlug === slug ? entry : null;
 }
 
-export async function getTopLevelPageDescriptors(): Promise<TopLevelPageDescriptor[]> {
+export async function getTopLevelPageDescriptors(): Promise<
+  TopLevelPageDescriptor[]
+> {
   const pages = await getCollection('pages');
   const publishedPages = filterDraftedPageEntries(pages);
 
@@ -395,3 +426,10 @@ export async function getTopLevelPageDescriptors(): Promise<TopLevelPageDescript
     })
     .filter((value): value is TopLevelPageDescriptor => value !== null);
 }
+
+export const getArticles = async () => {
+  const articles = await getCollection('articles');
+  console.log('🚀 ~ getArticles ~ articles:', articles.length);
+
+  return articles;
+};
