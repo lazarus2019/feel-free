@@ -1,0 +1,3 @@
+[submodule "src/content-feel-free"]
+	path = src/content-feel-free
+	url = https://github.com/lazarus2019/brain-storm
