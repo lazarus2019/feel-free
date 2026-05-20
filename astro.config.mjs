@@ -12,7 +12,7 @@ const { siteUrl, defaultLanguage, languages } = siteConfig;
 export default defineConfig({
   site: siteUrl,
   output: 'static',
-  trailingSlash: 'always',
+  trailingSlash: 'ignore',
   i18n: {
     defaultLocale: defaultLanguage,
     locales: languages,
@@ -51,7 +51,10 @@ export default defineConfig({
         output: {
           assetFileNames: (assetInfo) => {
             if (assetInfo.name?.endsWith('.ts')) {
-              const filename = assetInfo.name.split('/').pop()?.replace(/\.ts$/, '');
+              const filename = assetInfo.name
+                .split('/')
+                .pop()
+                ?.replace(/\.ts$/, '');
               return `_astro/${filename}.[hash].js`;
             }
             return 'assets/[name].[hash][extname]';
@@ -62,7 +65,9 @@ export default defineConfig({
     resolve: {
       alias: {
         '@config': fileURLToPath(new URL('./src/config', import.meta.url)),
-        '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+        '@components': fileURLToPath(
+          new URL('./src/components', import.meta.url),
+        ),
         '@layouts': fileURLToPath(new URL('./src/layouts', import.meta.url)),
         '@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
         '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
