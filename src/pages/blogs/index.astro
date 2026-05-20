@@ -1,0 +1,28 @@
+---
+import { getArticles } from "@lib/content";
+
+const articles = await getArticles();
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post list</title>
+</head>
+<body>
+  <h1>Post list</h1>
+  <ul>
+      {articles.map((article) => (
+        <li>
+          <a href={`/blogs/${article.data.slug}`}>
+            {article.data.title}
+          </a>
+        </li>
+      ))}
+    </ul>
+</body>
+</html>
+
+
+

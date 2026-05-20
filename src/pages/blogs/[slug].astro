@@ -1,0 +1,50 @@
+---
+import { getArticles } from '@lib/content';
+import { render, getEntry } from 'astro:content';
+
+export async function getStaticPaths(){
+  console.log('in the slug')
+  const articles = await getArticles()
+
+  return articles.map((article)=>({
+    params:{
+      slug: article.data.slug
+    },
+    props:{
+      article
+    }
+  }))
+}
+
+const {slug} = Astro.params
+
+if(slug === undefined){
+  console.error("Slug is missing")
+  return Astro.redirect('/blogs/404')
+}
+
+const entry = await getEntry('articles', slug)
+console.log('entry', entry?.data.slug)
+if(!entry){
+  console.error(`Article with slug ${slug} not found`)
+  return Astro.redirect('/blogs/404')
+}
+
+const {article} = Astro.props
+const {Content} = await render(article)
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post list</title>
+</head>
+  <body>
+    <h1>{article.data.title}</h1>
+
+    <article>
+      <Content />
+    </article>
+  </body>
+</html>
